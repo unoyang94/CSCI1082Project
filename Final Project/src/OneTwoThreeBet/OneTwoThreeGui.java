@@ -1,3 +1,10 @@
+/* 
+ * This program is guessing gambling game.
+ * Author: Ethan Lo, Marvin Va, Loudness Yang
+ * Final Project
+ * December, 10 2018
+ * CSCI 1082
+ */
 package OneTwoThreeBet;
 
 import java.awt.BorderLayout;
@@ -60,6 +67,7 @@ public class OneTwoThreeGui extends JFrame {
 	private JPanel final1 = new JPanel(new BorderLayout());
 	
 	AddToBalance balance = new AddToBalance();
+	Rules rules = new Rules();
 	BetGame Bet = new BetGame();
 
 	// Constructor
@@ -139,20 +147,23 @@ public class OneTwoThreeGui extends JFrame {
 		
 		public void actionPerformed(ActionEvent e) {
 			String callingBtn = e.getActionCommand();
-
+			
+			// Clears the area textbox
 			if (callingBtn.equals("Clear")) {
 				
 				outputArea.setText("");
-				
+			// Calling "Add Balance" button
 			} else if (callingBtn.equals("Add Balance")) {
 				
 				try {
+					// Changes textfield into a double
 					double adding = Double.parseDouble(buyInTxtFld.getText());
 					
 					//Makes sure that the user doesn't input numbers less than 0
 					if (adding > 0) {
 						balance.addBalance(adding);
-						outputArea.append(balance.toString() + "\n");
+						Bet.balanceMatchup(balance.getBalance());
+						outputArea.append("Your balance has been added!\n");
 						buyInTxtFld.setText("");
 					} else {
 						outputArea.append("Please enter a number greater than zero!\n");
@@ -163,35 +174,50 @@ public class OneTwoThreeGui extends JFrame {
 					outputArea.append("Please make sure you enter something greater than zero!\n");
 					
 				}
-				
+			// Calling "Balance" button
 			} else if(callingBtn.equals("Balance")) {
 				
-				outputArea.append(balance.toString()+"\n");
-				
+				outputArea.append("Your Current Balance: " + Bet.balance + "\n");
+			// Calling "Rules" button	
 			} else if(callingBtn.equals("Rules")) {
 				
-				outputArea.append("Rules\n"
-					+ "1: Add balance\n"
-					+ "2: Choose a number between 1-3\n"
-					+ "3: Enter bet amount\n"
-					+ "-------------------------------------------------------------------------\n"
-					+ "If number picked is correct, the amount of bet will double to balance.\n"
-					+ "If number picked is incorrect, the amount of bet will subtract to balance\n"
-					+ "-------------------------------------------------------------------------\n");
+				// Display rules
+				outputArea.append(rules + "\n");
 			
+			// Calling "callingBtn" button
 			} else if(callingBtn.equals("Bet")) {
-				
-				int chooseNum = chooseNumber.getSelectedIndex();
-				Double betAmount = Double.parseDouble(amountBetTxtFld.getText());
-				amountBetTxtFld.setText("");
-				Bet.playGame(chooseNum, balance.getBalance(), betAmount);
-				
-				outputArea.append(Bet.toString());
-				
+				try {
+					
+					// Gets text from textfields
+					int chooseNum = chooseNumber.getSelectedIndex() + 1;
+					Double betAmount = Double.parseDouble(amountBetTxtFld.getText());
+					
+					// Checks to see if you have enough to bet
+					if (betAmount > 0) {
+						if(Bet.betCheck(betAmount) == false) 
+						{
+							outputArea.append("You can't bet more than you have!\n");
+							amountBetTxtFld.setText("");
+						} 
+						else {
+							amountBetTxtFld.setText("");
+							Bet.playGame(chooseNum, betAmount);
+							outputArea.append(Bet.toString());
+						}
+					} else {
+						// Checks to make sure user enters a number greater than zero
+						outputArea.append("Please enter a number greater than zero!\n");
+						amountBetTxtFld.setText("");
+					}
+				}
+				// Makes sure user places a bet
+				catch(Exception ex) 
+				{
+					outputArea.append("Please make a bet!\n");
+				}
 			}
 		}
 	}
-		
 
 	public static void main(String[] args) {
 		
